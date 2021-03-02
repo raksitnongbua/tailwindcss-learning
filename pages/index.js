@@ -1,21 +1,25 @@
 import { Box, Button, Switch, TextField } from '@material-ui/core';
-import { alpha, makeStyles } from '@material-ui/core/styles';
+import { alpha } from '@material-ui/core/styles';
 import { useState } from 'react';
-const useStyles = makeStyles({
-  button: {
-    backgroundColor: 'red',
-  },
-});
-export default function Home() {
-  const { button } = useStyles();
-  const [darkMode, setDarkMode] = useState(false);
+import { connect } from 'react-redux';
+import { setDarkMode as setDarkModeAction } from '../stores/theme/action';
+const Home = (props) => {
+  console.log(props);
+  const { changeDarkMode, darkMode } = props;
   const handleDarkModeChange = (event) => {
-    console.log(event.target.checked);
-    setDarkMode(event.target.checked);
+    changeDarkMode(event.target.checked);
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    console.log(darkMode);
   };
   return (
     <div className='container mx-auto p-4'>
-      <Switch checked={darkMode} onChange={handleDarkModeChange}></Switch>
+      <div className='flex flex-row-reverse'>
+        <Switch checked={darkMode} onChange={handleDarkModeChange}></Switch>
+      </div>
       <Box
         sx={{
           display: 'flex',
@@ -76,22 +80,29 @@ export default function Home() {
           </Box>
         </Box>
       </Box>
-      <Button
-        // class='bg-blue-50'
-        // className='btn-blue'
-        className={button}
-        variant='contained'
-      >
+      <Button variant='contained' className='btn-blue m-1'>
         Click me! 2
       </Button>
-      <Box component={Button} sx='bg-red-400' variant='contained'>
-        Click me!
-      </Box>
-
-      <button className='bg-red-400'>btn</button>
-      <TextField variant='outlined' className='text-white' />
+      <Button color='primary' variant='outlined'>
+        Material BTN
+      </Button>
+      <TextField
+        variant='outlined'
+        className='border-white m-2'
+        inputProps={{ className: 'text-gray-900 dark:text-white' }}
+      />
       <h1 className='text-gray-900 dark:text-white'>Dark mode is here!</h1>
       <p className='text-gray-600 dark:text-gray-300'>Lorem ipsum...</p>
     </div>
   );
-}
+};
+const mapStateToProps = ({ darkMode }) => {
+  return {
+    darkMode,
+  };
+};
+const mapDispatchToProps = (dispatch) => ({
+  changeDarkMode: (darkMode) => dispatch(setDarkModeAction(darkMode)),
+});
+const HomeWithConnect = connect(mapStateToProps, mapDispatchToProps)(Home);
+export default HomeWithConnect;
